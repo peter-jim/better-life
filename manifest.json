@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "Self-Discipline Chrome Plugin",
+  "version": "1.0",
+  "description": "A Chrome plugin to block distracting websites and redirect to productive ones.",
+  "permissions": [
+    "webRequest",
+    "webRequestBlocking",
+    "storage",
+    "tabs"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icon.png"
+  },
+  "icons": {
+    "48": "./icon.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ]
+} 
