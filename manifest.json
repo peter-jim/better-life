@@ -5,10 +5,11 @@
   "description": "A Chrome plugin to block distracting websites and redirect to productive ones.",
   "permissions": [
     "webRequest",
-    "webRequestBlocking",
+    "declarativeNetRequest",
     "storage",
     "tabs"
   ],
+  "host_permissions": ["<all_urls>"],
   "background": {
     "service_worker": "background.js"
   },
@@ -17,7 +18,7 @@
     "default_icon": "icon.png"
   },
   "icons": {
-    "48": "./icon.png"
+    "48": "icon.png"
   },
   "content_scripts": [
     {
