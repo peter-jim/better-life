@@ -1,20 +1,32 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Tab navigation
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            // Remove active class from all buttons and contents
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            // Add active class to clicked button and corresponding content
+            button.classList.add('active');
+            const tabId = `${button.dataset.tab}-tab`;
+            document.getElementById(tabId).classList.add('active');
+        });
+    });
+
+    // DOM Elements
     const banList = document.getElementById('ban-list');
     const banUrlInput = document.getElementById('ban-url');
     const addBanButton = document.getElementById('add-ban');
     const redirectUrlInput = document.getElementById('redirect-url');
     const setRedirectButton = document.getElementById('set-redirect');
+    const siteCounter = document.getElementById('site-counter');
+    const emptyBanList = document.getElementById('empty-ban-list');
+    const emptyRedirect = document.getElementById('empty-redirect');
+    const currentRedirectDisplay = document.getElementById('current-redirect-display');
     const currentRedirect = document.getElementById('current-redirect');
-
-    // Load existing settings
-    chrome.storage.sync.get(['banList', 'redirectUrl'], function(data) {
-        if (data.banList && data.banList.length > 0) {
-            data.banList.forEach(url => addBanListItem(url));
-        }
-        if (data.redirectUrl) {
-            currentRedirect.textContent = `Current Redirect: ${data.redirectUrl}`;
-        }
-    });
 
     // Extract domain function - handles special cases
     function extractDomain(url) {
@@ -63,6 +75,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // Load existing settings
+    chrome.storage.sync.get(['banList', 'redirectUrl'], function(data) {
+        updateBanList(data.banList || []);
+        updateRedirectDisplay(data.redirectUrl);
+    });
+
     // Add URL to ban list
     addBanButton.addEventListener('click', function() {
         let url = banUrlInput.value.trim();
@@ -78,18 +96,32 @@ document.addEventListener('DOMContentLoaded', function() {
                         banListData.push(domain);
                         chrome.storage.sync.set({banList: banListData}, function() {
                             console.log(`Added ${domain} to ban list`);
-                            addBanListItem(domain);
                             banUrlInput.value = '';
+                            updateBanList(banListData);
+                            
+                            // Show success animation
+                            addBanButton.innerHTML = '<i class="fas fa-check"></i>';
+                            setTimeout(() => {
+                                addBanButton.innerHTML = '<i class="fas fa-plus"></i>';
+                            }, 1500);
                         });
                     } else {
                         console.log(`${domain} is already in the ban list`);
-                        alert(`${domain} is already in the ban list`);
+                        // Show alert in the button
+                        addBanButton.innerHTML = '<i class="fas fa-exclamation"></i>';
+                        setTimeout(() => {
+                            addBanButton.innerHTML = '<i class="fas fa-plus"></i>';
+                        }, 1500);
                         banUrlInput.value = '';
                     }
                 });
             } catch (e) {
                 console.error("Invalid URL:", e);
-                alert("Please enter a valid URL or domain name");
+                // Show error in the button
+                addBanButton.innerHTML = '<i class="fas fa-times"></i>';
+                setTimeout(() => {
+                    addBanButton.innerHTML = '<i class="fas fa-plus"></i>';
+                }, 1500);
             }
         }
     });
@@ -107,13 +139,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Validate URL
                 new URL(url);
                 chrome.storage.sync.set({redirectUrl: url}, function() {
-                    currentRedirect.textContent = `Current Redirect: ${url}`;
                     redirectUrlInput.value = '';
                     console.log(`Redirect URL set to ${url}`);
+                    updateRedirectDisplay(url);
+                    
+                    // Show success animation
+                    setRedirectButton.innerHTML = '<i class="fas fa-check"></i>';
+                    setTimeout(() => {
+                        setRedirectButton.innerHTML = '<i class="fas fa-check"></i>';
+                    }, 1500);
                 });
             } catch (e) {
                 console.error("Invalid redirect URL:", e);
-                alert("Please enter a valid redirect URL");
+                // Show error in the button
+                setRedirectButton.innerHTML = '<i class="fas fa-times"></i>';
+                setTimeout(() => {
+                    setRedirectButton.innerHTML = '<i class="fas fa-check"></i>';
+                }, 1500);
             }
         }
     });
@@ -131,32 +173,58 @@ document.addEventListener('DOMContentLoaded', function() {
             setRedirectButton.click();
         }
     });
-
-    // Helper function to add a ban list item with remove button
-    function addBanListItem(url) {
-        const li = document.createElement('li');
-        li.textContent = url;
+    
+    // Update the ban list display
+    function updateBanList(list) {
+        banList.innerHTML = '';
+        siteCounter.textContent = list.length;
         
-        // Add a delete button
-        const deleteBtn = document.createElement('button');
-        deleteBtn.textContent = '✕';
-        deleteBtn.style.marginLeft = '8px';
-        deleteBtn.addEventListener('click', function() {
-            removeBanListItem(url, li);
-        });
-        
-        li.appendChild(deleteBtn);
-        banList.appendChild(li);
+        if (list.length === 0) {
+            emptyBanList.classList.remove('hidden');
+        } else {
+            emptyBanList.classList.add('hidden');
+            
+            list.forEach(domain => {
+                const li = document.createElement('li');
+                
+                const domainSpan = document.createElement('span');
+                domainSpan.textContent = domain;
+                domainSpan.className = 'domain-name';
+                li.appendChild(domainSpan);
+                
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+                deleteBtn.addEventListener('click', function() {
+                    removeBanListItem(domain);
+                });
+                
+                li.appendChild(deleteBtn);
+                banList.appendChild(li);
+            });
+        }
+    }
+    
+    // Update the redirect display
+    function updateRedirectDisplay(url) {
+        if (url && url.trim() !== '') {
+            currentRedirect.textContent = url;
+            emptyRedirect.classList.add('hidden');
+            currentRedirectDisplay.classList.remove('hidden');
+        } else {
+            emptyRedirect.classList.remove('hidden');
+            currentRedirectDisplay.classList.add('hidden');
+        }
     }
     
     // Function to remove a site from the ban list
-    function removeBanListItem(url, listItem) {
+    function removeBanListItem(domain) {
         chrome.storage.sync.get('banList', function(data) {
             if (data.banList) {
-                const updatedList = data.banList.filter(item => item !== url);
+                const updatedList = data.banList.filter(item => item !== domain);
                 chrome.storage.sync.set({banList: updatedList}, function() {
-                    listItem.remove();
-                    console.log(`Removed ${url} from ban list`);
+                    console.log(`Removed ${domain} from ban list`);
+                    updateBanList(updatedList);
                 });
             }
         });

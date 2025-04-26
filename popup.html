@@ -5,20 +5,79 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Self-Discipline Plugin</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <h1>Self-Discipline Plugin</h1>
-    <div id="ban-list-section">
-        <h2>Ban List</h2>
-        <input type="text" id="ban-url" placeholder="Enter URL to ban">
-        <button id="add-ban">Add</button>
-        <ul id="ban-list"></ul>
-    </div>
-    <div id="redirect-section">
-        <h2>Redirect Settings</h2>
-        <input type="text" id="redirect-url" placeholder="Enter default redirect URL">
-        <button id="set-redirect">Set</button>
-        <p id="current-redirect"></p>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <h1>Focus Guard</h1>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="ban-list">Block List</button>
+            <button class="tab-btn" data-tab="redirect">Redirect</button>
+        </div>
+
+        <div class="tab-content active" id="ban-list-tab">
+            <div class="input-group">
+                <div class="input-wrapper">
+                    <i class="fas fa-link"></i>
+                    <input type="text" id="ban-url" placeholder="Enter website to block" autocomplete="off">
+                </div>
+                <button id="add-ban" class="action-btn">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+            
+            <div class="list-container">
+                <div class="list-header">
+                    <h2>Blocked Websites</h2>
+                    <span class="counter" id="site-counter">0</span>
+                </div>
+                <div class="empty-state" id="empty-ban-list">
+                    <i class="fas fa-shield-alt"></i>
+                    <p>No websites blocked yet</p>
+                    <span>Add websites above to block distractions</span>
+                </div>
+                <ul id="ban-list"></ul>
+            </div>
+        </div>
+
+        <div class="tab-content" id="redirect-tab">
+            <div class="section-info">
+                <i class="fas fa-info-circle"></i>
+                <p>When you visit a blocked site, you'll be redirected here:</p>
+            </div>
+            
+            <div class="input-group">
+                <div class="input-wrapper">
+                    <i class="fas fa-external-link-alt"></i>
+                    <input type="text" id="redirect-url" placeholder="Enter redirect URL" autocomplete="off">
+                </div>
+                <button id="set-redirect" class="action-btn">
+                    <i class="fas fa-check"></i>
+                </button>
+            </div>
+            
+            <div class="current-redirect-container">
+                <div class="empty-state" id="empty-redirect">
+                    <i class="fas fa-random"></i>
+                    <p>No redirect set</p>
+                    <span>Set a productive site to redirect to</span>
+                </div>
+                <div id="current-redirect-display" class="hidden">
+                    <div class="redirect-header">Current Redirect:</div>
+                    <div class="redirect-url" id="current-redirect"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Stay focused, stay productive</p>
+        </div>
     </div>
     <script src="popup.js"></script>
 </body>
