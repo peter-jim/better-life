@@ -3,25 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Self-Discipline Plugin</title>
+    <title>Focus Guard</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
+        <!-- Header with logo and app name -->
         <div class="header">
+            <!-- Theme toggle button -->
+            <button class="theme-toggle" id="theme-toggle">
+                <i class="fas fa-moon"></i>
+            </button>
+            
             <div class="logo">
                 <i class="fas fa-shield-alt"></i>
             </div>
             <h1>Focus Guard</h1>
         </div>
 
-        <div class="tabs">
-            <button class="tab-btn active" data-tab="ban-list">Block List</button>
-            <button class="tab-btn" data-tab="redirect">Redirect</button>
+        <!-- Quick statistics -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-value" id="sites-blocked">0</div>
+                <div class="stat-label">Sites Blocked</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="blocks-today">0</div>
+                <div class="stat-label">Today</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="focus-score">0</div>
+                <div class="stat-label">Focus Score</div>
+            </div>
         </div>
 
+        <!-- Main navigation tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="ban-list">
+                <i class="fas fa-list"></i> Block List
+            </button>
+            <button class="tab-btn" data-tab="redirect">
+                <i class="fas fa-exchange-alt"></i> Redirect
+            </button>
+        </div>
+
+        <!-- Block list tab content -->
         <div class="tab-content active" id="ban-list-tab">
+            <!-- Input for adding new sites -->
             <div class="input-group">
                 <div class="input-wrapper">
                     <i class="fas fa-link"></i>
@@ -32,26 +61,36 @@
                 </button>
             </div>
             
+            <!-- List of blocked sites -->
             <div class="list-container">
                 <div class="list-header">
                     <h2>Blocked Websites</h2>
                     <span class="counter" id="site-counter">0</span>
                 </div>
+                
+                <!-- Empty state when no sites are blocked -->
                 <div class="empty-state" id="empty-ban-list">
                     <i class="fas fa-shield-alt"></i>
                     <p>No websites blocked yet</p>
                     <span>Add websites above to block distractions</span>
                 </div>
-                <ul id="ban-list"></ul>
+                
+                <!-- Scrollable list of blocked sites -->
+                <div class="list-scroll-container">
+                    <ul id="ban-list"></ul>
+                </div>
             </div>
         </div>
 
+        <!-- Redirect tab content -->
         <div class="tab-content" id="redirect-tab">
+            <!-- Information about the redirect feature -->
             <div class="section-info">
                 <i class="fas fa-info-circle"></i>
-                <p>When you visit a blocked site, you'll be redirected here:</p>
+                <p>Instead of blocking sites completely, redirect to a productive alternative.</p>
             </div>
             
+            <!-- Input for setting redirect URL -->
             <div class="input-group">
                 <div class="input-wrapper">
                     <i class="fas fa-external-link-alt"></i>
@@ -62,21 +101,35 @@
                 </button>
             </div>
             
+            <!-- Current redirect display -->
             <div class="current-redirect-container">
+                <div class="list-header">
+                    <h2>Current Redirect</h2>
+                    <span class="badge badge-primary" id="redirect-status">
+                        <i class="fas fa-check-circle"></i> Active
+                    </span>
+                </div>
+                
+                <!-- Empty state when no redirect is set -->
                 <div class="empty-state" id="empty-redirect">
                     <i class="fas fa-random"></i>
                     <p>No redirect set</p>
                     <span>Set a productive site to redirect to</span>
                 </div>
+                
+                <!-- Display for current redirect -->
                 <div id="current-redirect-display" class="hidden">
-                    <div class="redirect-header">Current Redirect:</div>
-                    <div class="redirect-url" id="current-redirect"></div>
+                    <div class="redirect-url-wrapper">
+                        <img id="redirect-favicon" class="redirect-favicon" src="" alt="">
+                        <div class="redirect-url" id="current-redirect"></div>
+                    </div>
                 </div>
             </div>
         </div>
 
+        <!-- Footer with app info -->
         <div class="footer">
-            <p>Stay focused, stay productive</p>
+            <p>Focus Guard · Stay Productive</p>
         </div>
     </div>
     <script src="popup.js"></script>
