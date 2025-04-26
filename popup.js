@@ -357,9 +357,41 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 li.appendChild(domainSpan);
                 
+                // Add delete button
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+                deleteBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    removeBanListItem(domain);
+                });
+                
+                li.appendChild(deleteBtn);
                 banList.appendChild(li);
             });
         }
+    }
+    
+    // Function to remove a site from the ban list
+    function removeBanListItem(domain) {
+        chrome.storage.sync.get('banList', function(data) {
+            if (data.banList) {
+                const updatedList = data.banList.filter(item => item !== domain);
+                chrome.storage.sync.set({banList: updatedList}, function() {
+                    console.log(`Removed ${domain} from ban list`);
+                    updateBanList(updatedList);
+                    
+                    // Update stats
+                    stats.sitesBlocked = updatedList.length;
+                    stats.focusScore = Math.max(50, 50 + Math.floor(updatedList.length * 5));
+                    saveStats();
+                    updateStatsDisplay();
+                    
+                    // Show notification
+                    showToastNotification('Site removed from block list', 'success');
+                });
+            }
+        });
     }
     
     // Update the redirect display
